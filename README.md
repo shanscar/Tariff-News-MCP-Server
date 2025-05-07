@@ -1,74 +1,77 @@
+Tariff News MCP Server
+A specialized server for retrieving and analyzing tariff-related news using the Machine Conversation Protocol (MCP).
 
-# Tariff News MCP Server
-The MCP server `tariff-news-server` has been updated to support both stdio and SSE transports, selectable via a command-line argument. The necessary dependencies and code structure are in place. The server should start correctly in either mode, and the `get_tariff_reaction_news` tool is available.
+Overview
+The Tariff News MCP Server provides a robust interface for AI agents to access up-to-date tariff news and reactions. It supports both stdio and Server-Sent Events (SSE) transport methods, making it versatile for different integration scenarios.
 
-## Installation 
+Features
+Dual transport support (stdio and SSE)
 
-Download code
-```
+Specialized get_tariff_reaction_news tool for retrieving tariff-related news
+
+Integration with DuckDuckGo search for current news retrieval
+
+Configurable time limits for news searches
+
+Installation
+Clone the repository and install dependencies:
+
+bash
 git clone https://github.com/shanscar/Tariff-News-MCP-Server.git
-cd tariff-news-server
+cd Tariff-News-MCP-Server
 pip install -r requirements.txt
 pip install -e .
-```
-Run transport stdio 
-```
+Usage
+Running with stdio transport (default)
+bash
 python -m tariff_news_server.server
-```
-Run  transport  sse
-```
+Running with SSE transport
+bash
 python -m tariff_news_server.server --transport sse
-```
+Configuration
+Add the following to your mcp_settings.json file:
 
-## mcp_settings.json
-```
-{
-  "mcpServers": {
-    "tariff-news-server": {
-      "command": "python",
-      "args": [
-        "-m",
-        "tariff_news_server.server"
-      ],
-      "env": {},
-      "disabled": false,
-      "alwaysAllow": []
-    }
+json
+"mcpServers": {
+  "tariff-news-server": {
+    "command": "python",
+    "args": [
+      "-m",
+      "tariff_news_server.server"
+    ],
+    "env": {},
+    "disabled": false,
+    "alwaysAllow": []
   }
 }
-```
+Architecture
+The server follows a structured workflow:
 
-# Toolstack
-```
-VS Code
-Roo Code
-MCP Python SDK
-Google Gemini 2.5 Pro
-```
+Receives tool requests from MCP clients
 
-## Solution Diagram
+Processes requests through the appropriate transport layer
 
-I have generated a Mermaid sequence diagram illustrating the solution architecture for the Tariff News MCP Server. The diagram shows the interaction between the user, the MCP client, the MCP runner, the Python server process, the DuckDuckGo search library, and the external DuckDuckGo service to fulfill a tool request.
-```mermaid
-sequenceDiagram
-    participant User/AI Agent
-    participant MCP Client (Roo-Cline)
-    participant MCP Runner
-    participant Tariff News Server (Python Process)
-    participant DuckDuckGo Search Library
-    participant DuckDuckGo News Service
+Executes the requested tool function (e.g., get_tariff_reaction_news)
 
-    User/AI Agent->>+MCP Client (Roo-Cline): use_mcp_tool(server='tariff-news-server', tool='get_tariff_reaction_news', args={...})
-    MCP Client (Roo-Cline)->>+MCP Runner: Forward MCP Request
-    Note over MCP Runner, Tariff News Server (Python Process): Communication via Stdio (using `python -m tariff_news_server.server`)
-    MCP Runner->>+Tariff News Server (Python Process): CallToolRequest (get_tariff_reaction_news)
-    Tariff News Server (Python Process)->>Tariff News Server (Python Process): Validate input, call tool function
-    Tariff News Server (Python Process)->>+DuckDuckGo Search Library: ddgs.news(query, timelimit='w', ...)
-    DuckDuckGo Search Library->>+DuckDuckGo News Service: HTTP Search Request
-    DuckDuckGo News Service-->>-DuckDuckGo Search Library: Search Results
-    DuckDuckGo Search Library-->>-Tariff News Server (Python Process): Return results list
-    Tariff News Server (Python Process)->>Tariff News Server (Python Process): Process results, format as TextContent
-    Tariff News Server (Python Process)-->>-MCP Runner: CallToolResponse (TextContent with JSON results)
-    MCP Runner-->>-MCP Client (Roo-Cline): Forward MCP Response
-    MCP Client (Roo-Cline)-->>-User/AI Agent: Display Results
-```
+Queries DuckDuckGo for relevant news articles
+
+Processes and formats the results
+
+Returns structured data to the client
+
+Solution Diagram
+![MCP solution diagram](https://github.com/user-attachments/assets/a6ce6bb0-e4e0-473e-912d-f129f6a945df)
+
+Development Stack
+Language: Python
+
+IDE: VS Code with Roo Code
+
+Framework: MCP Python SDK
+
+AI Integration: Google Gemini 2.5 Pro
+
+Search Engine: DuckDuckGo News Service
+
+Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
