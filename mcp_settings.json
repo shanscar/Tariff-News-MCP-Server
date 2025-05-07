@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+  "tariff": {
+    "command": "./tariff-news-server/venv/bin/python3",
+    "args": [
+      "-m",
+      "tariff_news_server.server"
+    ]
+  }
+  }
+}
